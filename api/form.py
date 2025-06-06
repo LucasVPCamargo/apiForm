@@ -11,7 +11,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configurações do Google Sheets
-SHEET_ID = os.getenv('19DETLm_8BC8bw9zeu4vRN9aS3kqLkW0pJEZIVD4xHsQ')  # Armazene o ID da planilha em variável de ambiente
+SHEET_ID = os.getenv('SHEET_ID')  # Nome da variável de ambiente correta
 SHEET_NAME = 'Dados'  # Nome da aba/planilha
 
 # Escopos necessários
@@ -23,7 +23,7 @@ SCOPES = [
 # Autenticação
 def get_google_sheet():
     # Obtém as credenciais da variável de ambiente
-    creds_json = os.getenv('chaveKey')
+    creds_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
     if not creds_json:
         raise ValueError("Variável de ambiente GOOGLE_CREDENTIALS_JSON não encontrada")
     
