@@ -29,7 +29,7 @@ def get_google_sheet():
     
     # Converte a string JSON para um dicionário
     creds_dict = json.loads(creds_json)
-    
+     
     creds = service_account.Credentials.from_service_account_info(
         creds_dict, scopes=SCOPES)
     client = gspread.authorize(creds)
