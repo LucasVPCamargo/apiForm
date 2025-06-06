@@ -1,4 +1,1 @@
-pyodbc==4.0.39
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
+pymysql==1.1.0

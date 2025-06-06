@@ -1,17 +1,21 @@
+import sqlite3
 from http.server import BaseHTTPRequestHandler
 import json
+from datetime import datetime
+import os
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
+        # Configuração do banco de dados SQLite
+        DB_PATH = '/tmp/database.db'
         
-        response = {
-            "status": "success",
-            "message": "Endpoint funcionando corretamente",
-            "method": "POST"
-        }
+        # ... resto do seu código atual ...
         
-        self.wfile.write(json.dumps(response).encode())
-        return
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            
+            # ... operações com o banco de dados ...
+            
+        except Exception as e:
+            # ... tratamento de erros ...
