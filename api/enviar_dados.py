@@ -4,26 +4,17 @@ from google.oauth2 import service_account
 import gspread
 
 def handler(request):
-    # Compatibilidade: request pode ser dict (Vercel) ou objeto (local)
-    method = getattr(request, 'method', None) or request.get('method', None)
+    method = request.get('method', None)
     if method != 'POST':
         return {
             'statusCode': 405,
             'body': json.dumps({'status': 'error', 'message': 'Método não permitido'})
         }
-
     try:
-        # Tenta extrair o body do request
-        if hasattr(request, 'json') and request.json:
-            data = request.json
-        elif hasattr(request, 'get_json'):
-            data = request.get_json()
-        elif isinstance(request, dict) and 'body' in request:
-            # Vercel pode enviar o body como string JSON
+        if 'body' in request:
             data = json.loads(request['body'])
         else:
             data = {}
-
         required_fields = ['nome', 'sobrenome', 'email', 'telefone', 'mercado_apostas', 'trabalha_trafego']
         for field in required_fields:
             if field not in data or not data[field]:
@@ -31,7 +22,6 @@ def handler(request):
                     'statusCode': 400,
                     'body': json.dumps({'status': 'error', 'message': f'Campo {field} é obrigatório'})
                 }
-
         creds_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
         creds_dict = json.loads(creds_json)
         creds = service_account.Credentials.from_service_account_info(
@@ -44,7 +34,6 @@ def handler(request):
         sheet_name = 'Dados'
         client = gspread.authorize(creds)
         sheet = client.open_by_key(sheet_id).worksheet(sheet_name)
-
         row_data = [
             data.get('nome', ''),
             data.get('sobrenome', ''),
@@ -61,7 +50,6 @@ def handler(request):
             __import__('datetime').datetime.utcnow().isoformat()
         ]
         sheet.append_row(row_data)
-
         return {
             'statusCode': 200,
             'body': json.dumps({'status': 'success', 'message': 'Dados salvos na planilha com sucesso!'})
