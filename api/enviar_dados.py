@@ -4,14 +4,26 @@ from google.oauth2 import service_account
 import gspread
 
 def handler(request):
-    if request.method != 'POST':
+    # Compatibilidade: request pode ser dict (Vercel) ou objeto (local)
+    method = getattr(request, 'method', None) or request.get('method', None)
+    if method != 'POST':
         return {
             'statusCode': 405,
             'body': json.dumps({'status': 'error', 'message': 'Método não permitido'})
         }
 
     try:
-        data = request.json
+        # Tenta extrair o body do request
+        if hasattr(request, 'json') and request.json:
+            data = request.json
+        elif hasattr(request, 'get_json'):
+            data = request.get_json()
+        elif isinstance(request, dict) and 'body' in request:
+            # Vercel pode enviar o body como string JSON
+            data = json.loads(request['body'])
+        else:
+            data = {}
+
         required_fields = ['nome', 'sobrenome', 'email', 'telefone', 'mercado_apostas', 'trabalha_trafego']
         for field in required_fields:
             if field not in data or not data[field]:
@@ -46,7 +58,6 @@ def handler(request):
             data.get('tipo_trafego', ''),
             data.get('porque_upbet', ''),
             data.get('considera', ''),
-            # timestamp
             __import__('datetime').datetime.utcnow().isoformat()
         ]
         sheet.append_row(row_data)
